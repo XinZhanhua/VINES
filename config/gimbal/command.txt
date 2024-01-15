@@ -1,0 +1,21 @@
+conda deactivate
+source ~/vins_ws/devel/setup.bash
+source ~/vines_ws/devel/setup.bash
+roslaunch vines_estimator gimbal.launch
+roslaunch vins_estimator vins_rviz.launch
+roslaunch gmapping hector.launch
+rosbag play -r 0.5 --clock /media/huarsuma/DATA/dataset/gimbal-dog/experiment81/imu_encoder_image.bag
+rosbag play -r 0.4 --clock /media/huarsuma/DATA/dataset/gimbal-dog/experiment93/imu_encoder_image.bag
+rosbag play -r 0.5 -s 34 -u 7 ~/dataset/slam_dog/experiment13/imu_encoder_image.bag
+
+rosrun gmapping slam_gmapping scan:=/scan
+rosrun tf static_transform_publisher 0.20 0 0 0 0 0 base_link laser_frame 50
+rosrun tf static_transform_publisher 0.20 0 0 0 0 0 odom base_link 50//有问题，这个odom应该是轮子里程计的输出
+
+rosrun pose_recorder pose_recorder ~/catkin_ws/src/pose_recorder/output/out.csv
+
+roslaunch lego_loam run.launch
+
+~/vines_ws/src/VINES/config/gimbal/command_vins.sh
+~/vines_ws/src/VINES/config/gimbal/command_vines.sh
+~/vines_ws/src/VINES/config/gimbal/command_legoloam.sh
